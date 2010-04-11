@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name = 'shell_shock'
-  spec.version = '0.0.1'
+  spec.version = '0.0.2'
   spec.summary = "library for creating simple shell applications using readline"
   spec.description = <<-EOF
 This is just some code extracted from a few command line gems i've created (shh and cardigan).
@@ -14,6 +14,9 @@ EOF
  
   spec.files = Dir['lib/**/*'] + ['README.rdoc', 'MIT-LICENSE']
 
-  spec.add_dependency 'activesupport', ['~>2.3.5']
-  spec.add_dependency 'rawline', ['~>0.3.1']
+  spec.add_dependency 'activesupport', '~>2.3.5'
+  spec.add_dependency 'rawline', '~>0.3.1'
+
+  spec.add_development_dependency 'rake', '~>0.8.7'
+  spec.add_development_dependency 'gemesis', '~>0.0.3'
 end
