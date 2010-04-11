@@ -1,0 +1,23 @@
+= Shell Shock
+
+A library for creating command line shell application.
+
+== Rationale
+
+* command line tools are faster and cooler than any gui or web interface
+* tab completion is awesome
+* cutting and pasting code is bad
+
+== Installation
+
+  gem install shell_shock
+
+== Usage
+
+Here's a sample shell application using shell shock:
+
+require '
+
+class RootContext
+  
+end
