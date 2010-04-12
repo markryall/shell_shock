@@ -7,13 +7,17 @@ module ShellShock
     def refresh
       refresh_commands if respond_to?(:refresh_commands)
       @editor.completion_proc = lambda do |word|
-        words = @editor.line.words
-        if words.first
-          command = @commands[words.first]
-          if command and command.respond_to?(:completion)
-            rest = words.slice(1..-1)
-            rest ||= []
-            return command.completion(rest.join(' '))
+        name, *words = @editor.line.text.scan(/[\w?]+/)
+        if name
+          command = @commands[name]
+          if command
+            if command.respond_to?(:completion)
+              rest = words || []
+              completions = command.completion(rest.join(' ')).map {|c| "#{name} #{c}" }
+              return completions
+            else
+              return []
+            end
           end
         end
 
@@ -23,24 +27,24 @@ module ShellShock
 
     def push
       @editor = RawLine::Editor.new
+      @editor.word_break_characters = ''
       @editor.bind(:ctrl_d) { return }
+      @editor.bind(:ctrl_a) { @editor.move_to_position(0) }
+      @editor.bind(:ctrl_e) { @editor.move_to_position(@editor.line.text.length) }
+      
       refresh
       begin
         while line = @editor.read(@prompt_text, true)
           line.strip!
           case line
-            when /^\?$/
-              process_help 
-            when /^\? (.*)/
-              process_help $1
-            when /^(\w+) (.*)/
+            when /^([\w?]+) (.*)/
               return if ['quit', 'exit'].include?($1)
               process_command $1, $2
-            when /^(\w+)/
+            when /^([\w?]+)/
               return if ['quit', 'exit'].include?($1)
               process_command $1
             else
-              puts 'unknown command'
+              puts "can not process line \"#{line}\""
           end
           puts
           refresh
@@ -58,7 +62,7 @@ module ShellShock
         @io.say "Usage: #{command_name} #{command.usage}" if command.respond_to?(:usage)
         @io.say "Help:\n #{command.help}" if command.respond_to?(:help)      
       else
-        puts 'unknown command'
+        puts "no help available for command \"#{command_name}\""
       end
     end
 
@@ -80,7 +84,7 @@ module ShellShock
       if @commands[name]
         @commands[name].execute parameter
       else
-        @io.say 'unknown command'
+        @io.say "unknown command \"#{name}\""
       end
     end
   end
