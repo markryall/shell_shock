@@ -14,9 +14,6 @@ EOF
  
   spec.files = Dir['lib/**/*'] + ['README.rdoc', 'MIT-LICENSE']
 
-  spec.add_dependency 'activesupport', '~>2.3.5'
-  spec.add_dependency 'rawline', '~>0.3.1'
-
   spec.add_development_dependency 'rake', '~>0.8.7'
   spec.add_development_dependency 'gemesis', '~>0.0.3'
 end

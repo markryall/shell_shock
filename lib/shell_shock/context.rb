@@ -1,13 +1,13 @@
 require 'rubygems'
-require 'rawline'
-require 'active_support/inflector'
+require 'readline'
 
 module ShellShock
   module Context
     def refresh
       refresh_commands if respond_to?(:refresh_commands)
-      @editor.completion_proc = lambda do |word|
-        name, *words = @editor.line.text.scan(/[\w?]+/)
+      Readline.completer_word_break_characters = ''
+      Readline.completion_proc = lambda do |word|
+        name, *words = word.scan(/[\w?]+/)
         if name
           command = @commands[name]
           if command
@@ -26,15 +26,9 @@ module ShellShock
     end
 
     def push
-      @editor = RawLine::Editor.new
-      @editor.word_break_characters = ''
-      @editor.bind(:ctrl_d) { return }
-      @editor.bind(:ctrl_a) { @editor.move_to_position(0) }
-      @editor.bind(:ctrl_e) { @editor.move_to_position(@editor.line.text.length) }
-      
       refresh
       begin
-        while line = @editor.read(@prompt_text, true)
+        while line = Readline.readline(@prompt_text, true)
           line.strip!
           case line
             when /^([\w?]+) (.*)/
