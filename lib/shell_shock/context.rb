@@ -38,15 +38,15 @@ module ShellShock
               return if ['quit', 'exit'].include?($1)
               process_command $1
             else
-              puts "can not process line \"#{line}\""
+              @io.say "can not process line \"#{line}\""
           end
-          puts
+          @io.say
           refresh
         end
       rescue Interrupt => e
         return
       end
-      puts
+      @io.say
     end
 
     def display_help_for_command command_name
@@ -56,7 +56,7 @@ module ShellShock
         @io.say "Usage: #{command_name} #{command.usage}" if command.respond_to?(:usage)
         @io.say "Help:\n #{command.help}" if command.respond_to?(:help)      
       else
-        puts "no help available for command \"#{command_name}\""
+        @io.say "no help available for command \"#{command_name}\""
       end
     end
 
