@@ -1,54 +1,10 @@
 require 'rubygems'
 require 'readline'
+require 'shell_shock/exit_command'
+require 'shell_shock/help_command'
+require 'shell_shock/logger'
 
 module ShellShock
-  module Logger
-    def log message
-      return unless ENV['LOG_PATH']
-      File.open(ENV['LOG_PATH'], 'a') do |file|
-        file.puts message
-      end
-    end
-  end
-
-  class HelpCommand
-    def initialize commands
-      @commands = commands
-    end
-
-    def usage
-      '<command name>'
-    end
-
-    def help
-      'displays the help information for a command'
-    end
-
-    def completion text
-      @commands.keys.grep(/^#{Regexp.escape(text)}/).sort
-    end
-
-    def execute command
-      if command.empty?
-        puts 'Available commands:'
-        @commands.keys.sort.each { |command| puts command }        
-      else
-        display_help_for_command command
-      end
-    end
-
-    def display_help_for_command command_name
-      command = @commands[command_name]
-      if command
-        puts "Command \"#{command_name}\""
-        puts "Usage: #{command_name} #{command.usage}" if command.respond_to?(:usage)
-        puts "Help:\n #{command.help}" if command.respond_to?(:help)
-      else
-        puts "no help available for command \"#{command_name}\""
-      end
-    end
-  end
-
   module Context
     include Logger
 
@@ -86,29 +42,37 @@ module ShellShock
       end
     end
 
+    def abort!
+      @abort = true
+    end
+
+    def abort?
+      @abort
+    end
+
+    def add_command command, *aliases
+      @commands ||= {}
+      aliases.each {|a| @commands[a] = command}
+    end
+
     def push
-      help = HelpCommand.new @commands
-      @commands['?'] = help
-      @commands['help'] = help
-      finished = false
+      @prompt ||= ' > '
+      add_command HelpCommand.new(@commands), '?', 'help'
+      add_command ExitCommand.new(self), 'exit', 'quit'
       begin
-        until finished 
+        until abort?
           refresh
-          line = Readline.readline(@prompt_text, true)
+          line = Readline.readline(@prompt, true)
           if line
             first, rest = head_tail(line)
             log "looking for command \"#{first}\" with parameter \"#{rest}\""
-            if ['quit', 'exit'].include? first
-              finished = true
+            if @commands[first]
+              @commands[first].execute rest
             else
-              if @commands[first]
-                @commands[first].execute rest
-              else
-                puts "unknown command \"#{first}\""
-              end
+              puts "unknown command \"#{first}\""
             end
           else
-            finished = true
+            abort!
           end
           puts
         end
