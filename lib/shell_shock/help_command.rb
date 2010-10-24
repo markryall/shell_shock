@@ -13,12 +13,13 @@ module ShellShock
     end
 
     def execute command
-      if command.empty?
-        puts 'Available commands:'
-        @commands.keys.sort.each { |command| puts command }
-      else
-        display_help_for_command command
-      end
+      command.empty? ? display_help_for_commands : display_help_for_command(command)
+    end
+
+    def display_help_for_commands
+      return if @commands.keys.empty?
+      puts 'Available commands:'
+      @commands.keys.sort.each { |command| puts command }
     end
 
     def display_help_for_command command_name
