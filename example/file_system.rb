@@ -18,7 +18,8 @@ class Finder
       if File.basename(p).start_with?('.')
         Find.prune
       else
-        files << Pathname.new(p).relative_path_from(here) if p.include?(pattern) and yield(p)
+        path = Pathname.new(p).relative_path_from(here).to_s
+        files << path if path.start_with?(pattern) and yield(p)
       end
     end
     files
@@ -55,6 +56,7 @@ class ChangeDirectoryCommand
   include ShellShock::Logger
 
   def initialize path
+    @path = path
     @finder = Finder.new path
   end
 
@@ -74,7 +76,7 @@ class ChangeDirectoryCommand
   def execute text=nil
     return unless text 
     log "pushing new shell in \"#{text}\""
-    DirectoryContext.new(text).push
+    DirectoryContext.new(@path+'/'+text).push
   end
 end
 
