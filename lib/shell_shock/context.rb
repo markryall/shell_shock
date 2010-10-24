@@ -2,83 +2,118 @@ require 'rubygems'
 require 'readline'
 
 module ShellShock
-  module Context
-    def refresh
-      refresh_commands if respond_to?(:refresh_commands)
-      Readline.completer_word_break_characters = ''
-      Readline.completion_proc = lambda do |word|
-        name, *words = word.scan(/[\w?]+/)
-        if name
-          command = @commands[name]
-          if command
-            if command.respond_to?(:completion)
-              rest = words || []
-              completions = command.completion(rest.join(' ')).map {|c| "#{name} #{c}" }
-              return completions
-            else
-              return []
-            end
-          end
-        end
-
-        @commands.keys.grep( /^#{Regexp.escape(word)}/ ).sort
+  module Logger
+    def log message
+      return unless ENV['LOG_PATH']
+      File.open(ENV['LOG_PATH'], 'a') do |file|
+        file.puts message
       end
     end
+  end
 
-    def push
-      refresh
-      begin
-        while line = Readline.readline(@prompt_text, true)
-          line.strip!
-          case line
-            when /^([\w?]+) (.*)/
-              return if ['quit', 'exit'].include?($1)
-              process_command $1, $2
-            when /^([\w?]+)/
-              return if ['quit', 'exit'].include?($1)
-              process_command $1
-            else
-              @io.say "can not process line \"#{line}\""
-          end
-          @io.say
-          refresh
-        end
-      rescue Interrupt => e
-        return
+  class HelpCommand
+    def initialize commands
+      @commands = commands
+    end
+
+    def usage
+      '<command name>'
+    end
+
+    def help
+      'displays the help information for a command'
+    end
+
+    def completion text
+      @commands.keys.grep(/^#{Regexp.escape(text)}/).sort
+    end
+
+    def execute command
+      if command.empty?
+        puts 'Available commands:'
+        @commands.keys.sort.each { |command| puts command }        
+      else
+        display_help_for_command command
       end
-      @io.say
     end
 
     def display_help_for_command command_name
       command = @commands[command_name]
       if command
-        @io.say "Command \"#{command_name}\""
-        @io.say "Usage: #{command_name} #{command.usage}" if command.respond_to?(:usage)
-        @io.say "Help:\n #{command.help}" if command.respond_to?(:help)      
+        puts "Command \"#{command_name}\""
+        puts "Usage: #{command_name} #{command.usage}" if command.respond_to?(:usage)
+        puts "Help:\n #{command.help}" if command.respond_to?(:help)
       else
-        @io.say "no help available for command \"#{command_name}\""
+        puts "no help available for command \"#{command_name}\""
+      end
+    end
+  end
+
+  module Context
+    include Logger
+
+    def head_tail string
+      if string
+        m = /[^ ]+/.match(string.strip)
+        return m[0], m.post_match.strip if m
+      end
+      return '', ''
+    end
+
+    def refresh
+      refresh_commands if respond_to?(:refresh_commands)
+      Readline.completer_word_break_characters = ''
+      Readline.completion_proc = lambda do |string|
+        log "trying completion for \"#{string}\""
+        first, rest = head_tail(string)
+        log "split \"#{first}\" from \"#{rest}\""
+        if first
+          command = @commands[first]
+          if command
+            log "matched #{first} command"
+            if command.respond_to?(:completion)
+              completions = command.completion(rest).map {|c| "#{first} #{c}" }
+            else
+              log "#{first} has no completion proc"
+              completions = []
+            end
+          end
+        end
+
+        completions ||= @commands.keys.grep( /^#{Regexp.escape(first)}/ ).sort
+        log "returning #{completions.inspect} completions"
+        completions
       end
     end
 
-    def process_help command=nil
-      if command
-        display_help_for_command command
-      else
-        @io.say "Available commands:"
-        @commands.keys.sort.each { |command| @io.say command }
-        @io.say
-      end      
-    end
-
-    def process_command name, parameter=nil
-      if ['?', 'help'].include?(name)
-        process_help parameter
-        return
-      end
-      if @commands[name]
-        @commands[name].execute parameter
-      else
-        @io.say "unknown command \"#{name}\""
+    def push
+      help = HelpCommand.new @commands
+      @commands['?'] = help
+      @commands['help'] = help
+      finished = false
+      begin
+        until finished 
+          refresh
+          line = Readline.readline(@prompt_text, true)
+          if line
+            first, rest = head_tail(line)
+            log "looking for command \"#{first}\" with parameter \"#{rest}\""
+            if ['quit', 'exit'].include? first
+              finished = true
+            else
+              if @commands[first]
+                @commands[first].execute rest
+              else
+                puts "unknown command \"#{first}\""
+              end
+            end
+          else
+            finished = true
+          end
+          puts
+        end
+      rescue Interrupt => e
+        puts
       end
     end
   end
