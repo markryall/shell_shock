@@ -1,15 +1,11 @@
 module ShellShock
   class HelpCommand
+    attr_reader :help, :usage
+
     def initialize commands
       @commands = commands
-    end
-
-    def usage
-      '<command name>'
-    end
-
-    def help
-      'displays the help information for a command'
+      @usage = '<command name>'
+      @help = 'displays the help information for a command'
     end
 
     def completion text

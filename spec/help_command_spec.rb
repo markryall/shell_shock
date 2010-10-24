@@ -1,6 +1,10 @@
 require File.dirname(__FILE__)+'/spec_helper'
 
 describe ShellShock::HelpCommand do
+  extend ShellShock::CommandSpec
+  with_usage '<command name>'
+  with_help 'displays the help information for a command'
+
   before do
     @commands = stub('commands')
     @command = ShellShock::HelpCommand.new @commands

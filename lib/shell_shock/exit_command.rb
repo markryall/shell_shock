@@ -1,15 +1,11 @@
 module ShellShock
   class ExitCommand
+    attr_reader :help, :usage
+
     def initialize context
       @context = context
-    end
-
-    def usage
-      ''
-    end
-
-    def help
-      'exits the current context'
+      @usage = ''
+      @help = 'exits the current context'
     end
 
     def execute ignore
