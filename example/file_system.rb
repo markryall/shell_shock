@@ -42,7 +42,7 @@ class CatFileCommand
   end
 
   def completion text
-    log "cat command completing \"#{text}\""
+    log { "cat command completing \"#{text}\"" }
     @finder.refresh(text) {|path| File.file? path }
   end
 
@@ -69,13 +69,13 @@ class ChangeDirectoryCommand
   end
 
   def completion text
-    log "cd command completing \"#{text}\""
+    log { "cd command completing \"#{text}\"" }
     @finder.refresh(text) {|path| path != '.' and File.directory? path }
   end
 
   def execute text=nil
     return unless text 
-    log "pushing new shell in \"#{text}\""
+    log { "pushing new shell in \"#{text}\"" }
     DirectoryContext.new(@path+'/'+text).push
   end
 end

@@ -37,4 +37,45 @@ describe TestContext do
     Readline.should_receive(:readline).with(' > ', true)
     @context.push
   end
+
+  it 'should not call readline when aborted' do
+    Readline.should_not_receive :readline
+    @context.abort!
+    @context.push
+  end
+
+  it 'should perform refresh_commands callback' do
+    @context.should_receive :refresh_commands
+    @context.push
+  end
+
+  it 'should return blank strings from head_tail for nil string' do
+    head, tail = @context.head_tail nil
+    head.should == ''
+    tail.should == ''
+  end
+
+  it 'should return blank strings from head_tail for blank string' do
+    head, tail = @context.head_tail ''
+    head.should == ''
+    tail.should == ''
+  end
+
+  it 'should split the head from the tail with a single word' do
+    head, tail = @context.head_tail 'a'
+    head.should == 'a'
+    tail.should == ''
+  end
+
+  it 'should split the head from the tail with a single word with trailing whitespace' do
+    head, tail = @context.head_tail 'a '
+    head.should == 'a'
+    tail.should == ''
+  end
+
+  it 'should split the head from the tail with multiple words' do
+    head, tail = @context.head_tail 'a b c '
+    head.should == 'a'
+    tail.should == 'b c'
+  end
 end

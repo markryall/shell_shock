@@ -20,24 +20,24 @@ module ShellShock
       refresh_commands if respond_to?(:refresh_commands)
       Readline.completer_word_break_characters = ''
       Readline.completion_proc = lambda do |string|
-        log "trying completion for \"#{string}\""
+        log { "trying completion for \"#{string}\"" }
         first, rest = head_tail(string)
-        log "split \"#{first}\" from \"#{rest}\""
+        log { "split \"#{first}\" from \"#{rest}\"" }
         if first
           command = @commands[first]
           if command
-            log "matched #{first} command"
+            log { "matched #{first} command" }
             if command.respond_to?(:completion)
               completions = command.completion(rest).map {|c| "#{first} #{c}" }
             else
-              log "#{first} has no completion proc"
+              log { "#{first} has no completion proc" }
               completions = []
             end
           end
         end
 
         completions ||= @commands.keys.grep( /^#{Regexp.escape(first)}/ ).sort
-        log "returning #{completions.inspect} completions"
+        log { "returning #{completions.inspect} completions" }
         completions
       end
     end
@@ -65,7 +65,7 @@ module ShellShock
           line = Readline.readline(@prompt, true)
           if line
             first, rest = head_tail(line)
-            log "looking for command \"#{first}\" with parameter \"#{rest}\""
+            log { "looking for command \"#{first}\" with parameter \"#{rest}\"" }
             if @commands[first]
               @commands[first].execute rest
             else
