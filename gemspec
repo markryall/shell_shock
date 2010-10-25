@@ -12,7 +12,7 @@ EOF
   spec.email = 'mark@ryall.name'
   spec.homepage = 'http://github.com/markryall/shell_shock'
  
-  spec.files = Dir['lib/**/*'] + ['README.rdoc', 'MIT-LICENSE']
+  spec.files = Dir['example/**/*'] + Dir['lib/**/*'] + ['README.rdoc', 'MIT-LICENSE']
 
   spec.add_development_dependency 'rake', '~>0.8.7'
   spec.add_development_dependency 'gemesis', '~>0.0.4'

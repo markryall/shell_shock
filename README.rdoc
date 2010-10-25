@@ -14,70 +14,10 @@ A library for creating command line shell application.
 
 == Usage
 
-The basic idea is that you create classes with the ShellShock::Context mixin.  Start a shell by instantiating the class and executing the push method.  Any number of nested shells may be pushed and exit falls back to the previous shell.
+The basic idea is that you create classes and include the ShellShock::Context mixin.  Start a shell by instantiating the class and executing the push method.  Any number of nested shells may be pushed and exit falls back to the previous shell.
 
 These classes represent a shell context with a number of commands registered.  These commands are matched with tab completion.  In addition to registered commands, 'exit', 'quit', 'help' and '?' are always available.
 
 Each command must have an execute method that accepts a string (the remaining content after the command name).  Commands may also implement usage and help methods.  They may also implement a completion method so may have arbitrarily complex completion rules per parameter.
 
-Here's a sample shell application using shell shock.  It has 'cd' and 'cat' commands.  'cd' performs tab completion for directories and execution enters a nested context.  'cat' performs tab completion for files and execution dumps the file content.
-
-  require 'shell_shock/context'
-
-  class CatFileCommand
-    def initialize path
-      @path = path
-    end
-
-    def usage
-      '<file name>'
-    end
-
-    def help
-      'displays the content of a file'
-    end
-
-    def completion text
-      Dir.glob("#{@path}/#{text}*").select {|f| File.file?(f) }
-    end
-
-    def execute path
-      File.open(path) {|f| f.each_with_index {|l,i| puts "#{i+1}: #{l}" } }
-    end
-  end
-
-  class ChangeDirectoryCommand
-    def initialize path
-      @path = path
-    end
-
-    def usage
-      '<directory name>'
-    end
-
-    def help
-      'switches to a new shell context in the specified directory'
-    end
-
-    def completion text
-      Dir.glob("#{@path}/#{text}*").select {|f| File.directory?(f) }
-    end
-
-    def execute text
-      DirectoryContext.new(text).push
-    end
-  end
-
-  class DirectoryContext
-    include ShellShock::Context
-
-    def initialize path
-      @prompt_text = "#{path} > "
-      @commands = {
-        'cd' => ChangeDirectoryCommand.new(path),
-        'cat' => CatFileCommand.new(path)
-      }
-    end
-  end
-
-  DirectoryContext.new('.').push
+Refer to the examples directory for some sample shells.
