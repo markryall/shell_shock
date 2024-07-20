@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = "shell_shock"
-  spec.version = "0.0.5"
+  spec.version = "0.0.6"
   spec.summary = "library for creating simple shell applications using readline"
   spec.description = <<~DESCRIPTION
     This is just some code extracted from a few command line gems i've created (shh and cardigan).

@@ -38,7 +38,7 @@ module ShellShock
           end
         end
 
-        completions ||= @commands.keys.grep(/^#{Regexp.escape(first)}/).sort
+        completions ||= @commands.keys.grep(/^#{Regexp.escape(first)}/).sort.map { |c| "#{c} " }
         log { "returning #{completions.inspect} completions" }
         completions
       end
