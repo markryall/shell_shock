@@ -1,28 +1,31 @@
+# frozen_string_literal: true
+
 module ShellShock
   class HelpCommand
     attr_reader :help, :usage
 
-    def initialize commands
+    def initialize(commands)
       @commands = commands
-      @usage = '<command name>'
-      @help = 'displays the help information for a command'
+      @usage = "<command name>"
+      @help = "displays the help information for a command"
     end
 
-    def completion text
+    def completion(text)
       @commands.keys.grep(/^#{Regexp.escape(text)}/).sort
     end
 
-    def execute command
+    def execute(command)
       command.empty? ? display_help_for_commands : display_help_for_command(command)
     end
 
     def display_help_for_commands
       return if @commands.keys.empty?
-      puts 'Available commands:'
+
+      puts "Available commands:"
       @commands.keys.sort.each { |command| puts command }
     end
 
-    def display_help_for_command command_name
+    def display_help_for_command(command_name)
       command = @commands[command_name]
       if command
         puts "Command \"#{command_name}\""

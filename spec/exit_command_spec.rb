@@ -1,17 +1,19 @@
-require File.dirname(__FILE__)+'/spec_helper'
+# frozen_string_literal: true
+
+require "#{File.dirname(__FILE__)}/spec_helper"
 
 describe ShellShock::ExitCommand do
   extend ShellShock::CommandSpec
-  with_usage ''
-  with_help 'exits the current context'
+  with_usage ""
+  with_help "exits the current context"
 
   before do
-    @context = stub('context')
+    @context = stub("context")
     @command = ShellShock::ExitCommand.new @context
   end
 
-  it 'should abort context when executed' do
+  it "should abort context when executed" do
     @context.should_receive(:abort!)
-    @command.execute ''
+    @command.execute ""
   end
 end

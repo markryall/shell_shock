@@ -1,7 +1,9 @@
-$: << File.dirname(__FILE__)+'/../lib'
+# frozen_string_literal: true
 
-require 'shell_shock/context'
-require 'shell_shock/command_spec'
+$LOAD_PATH << "#{File.dirname(__FILE__)}/../lib"
+
+require "shell_shock/context"
+require "shell_shock/command_spec"
 
 RSpec.configure do |config|
   config.mock_framework = :rspec

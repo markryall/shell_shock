@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 module ShellShock
   class ExitCommand
     attr_reader :help, :usage
 
-    def initialize context
+    def initialize(context)
       @context = context
-      @usage = ''
-      @help = 'exits the current context'
+      @usage = ""
+      @help = "exits the current context"
     end
 
-    def execute ignore
+    def execute(_ignore)
       @context.abort!
     end
-  end  
+  end
 end

@@ -1,24 +1,26 @@
-require 'rubygems'
-require 'readline'
-require 'shell_shock/exit_command'
-require 'shell_shock/help_command'
-require 'shell_shock/logger'
+# frozen_string_literal: true
+
+require "rubygems"
+require "readline"
+require "shell_shock/exit_command"
+require "shell_shock/help_command"
+require "shell_shock/logger"
 
 module ShellShock
   module Context
     include Logger
 
-    def head_tail string
+    def head_tail(string)
       if string
         m = /[^ ]+/.match(string.strip)
         return m[0], m.post_match.strip if m
       end
-      return '', ''
+      ["", ""]
     end
 
     def refresh
       refresh_commands if respond_to?(:refresh_commands)
-      Readline.completer_word_break_characters = ''
+      Readline.completer_word_break_characters = ""
       Readline.completion_proc = lambda do |string|
         log { "trying completion for \"#{string}\"" }
         first, rest = head_tail(string)
@@ -28,7 +30,7 @@ module ShellShock
           if command
             log { "matched #{first} command" }
             if command.respond_to?(:completion)
-              completions = command.completion(rest).map {|c| "#{first} #{c}" }
+              completions = command.completion(rest).map { |c| "#{first} #{c}" }
             else
               log { "#{first} has no completion proc" }
               completions = []
@@ -36,7 +38,7 @@ module ShellShock
           end
         end
 
-        completions ||= @commands.keys.grep( /^#{Regexp.escape(first)}/ ).sort
+        completions ||= @commands.keys.grep(/^#{Regexp.escape(first)}/).sort
         log { "returning #{completions.inspect} completions" }
         completions
       end
@@ -52,13 +54,13 @@ module ShellShock
 
     def add_command command, *aliases
       @commands ||= {}
-      aliases.each {|a| @commands[a] = command}
+      aliases.each { |a| @commands[a] = command }
     end
 
     def push
-      @prompt ||= ' > '
-      add_command HelpCommand.new(@commands), '?', 'help'
-      add_command ExitCommand.new(self), 'exit', 'quit'
+      @prompt ||= " > "
+      add_command HelpCommand.new(@commands), "?", "help"
+      add_command ExitCommand.new(self), "exit", "quit"
       begin
         until abort?
           refresh
@@ -76,7 +78,7 @@ module ShellShock
           end
           puts
         end
-      rescue Interrupt => e
+      rescue Interrupt
         puts
       end
     end
