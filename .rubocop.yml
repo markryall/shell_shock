@@ -1,3 +1,7 @@
+require:
+  - rubocop-rspec
+  - rubocop-rake
+
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: enable
@@ -23,4 +27,16 @@ Metrics/BlockLength:
   Enabled: false
 
 Metrics/AbcSize:
+  Enabled: false
+
+RSpec/InstanceVariable:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+RSpec/MultipleExpectations:
   Enabled: false

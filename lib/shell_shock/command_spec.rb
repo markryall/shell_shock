@@ -3,11 +3,11 @@
 module ShellShock
   module CommandSpec
     def with_usage(text)
-      it("should display usage") { @command.usage.should == text }
+      it("displays usage") { expect(@command.usage).to eq(text) }
     end
 
     def with_help(text)
-      it("should display help") { @command.help.should == text }
+      it("displays help") { expect(@command.help).to eq(text) }
     end
   end
 end
