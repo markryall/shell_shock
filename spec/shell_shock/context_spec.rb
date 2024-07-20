@@ -23,7 +23,7 @@ describe ShellShock::Context do
   it "initialises commands if there are none in push" do
     @context.push
 
-    expect(@context.commands.keys.sort).to eq(%w[? exit help quit])
+    expect(@context.commands.keys.sort).to eq(%w[exit help])
   end
 
   it "sets up a default prompt in push" do

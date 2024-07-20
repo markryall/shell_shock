@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shell_shock (0.0.5)
+    shell_shock (0.0.6)
 
 GEM
   remote: https://rubygems.org/

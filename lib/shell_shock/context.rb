@@ -59,8 +59,8 @@ module ShellShock
 
     def push
       @prompt ||= " > "
-      add_command HelpCommand.new(@commands), "?", "help"
-      add_command ExitCommand.new(self), "exit", "quit"
+      add_command HelpCommand.new(@commands), "help"
+      add_command ExitCommand.new(self), "exit"
       begin
         until abort?
           refresh
